@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Calculator, Clock, Settings } from 'lucide-react-native';
+import { Calculator, Clock, Settings, CalculatorIcon, Percent } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -26,9 +26,17 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
+          title: 'GST',
+          tabBarIcon: ({ color, size }) => <Percent size={size} color={color} />,
+          headerTitle: 'GST Calculator',
+        }}
+      />
+      <Tabs.Screen
+        name="calculator"
+        options={{
           title: 'Calculator',
           tabBarIcon: ({ color, size }) => <Calculator size={size} color={color} />,
-          headerTitle: 'GST Calculator',
+          headerTitle: 'Basic Calculator',
         }}
       />
       <Tabs.Screen
