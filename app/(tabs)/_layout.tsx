@@ -1,0 +1,52 @@
+import { Tabs } from 'expo-router';
+import { Calculator, Clock, Settings } from 'lucide-react-native';
+
+export default function TabLayout() {
+  return (
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#1A237E',
+        tabBarInactiveTintColor: '#9E9E9E',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        tabBarStyle: {
+          height: 60,
+          paddingBottom: 8,
+        },
+        headerStyle: {
+          backgroundColor: '#1A237E',
+        },
+        headerTitleStyle: {
+          color: '#FFFFFF',
+          fontWeight: '600',
+        },
+      }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Calculator',
+          tabBarIcon: ({ color, size }) => <Calculator size={size} color={color} />,
+          headerTitle: 'GST Calculator',
+        }}
+      />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'History',
+          tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
+          headerTitle: 'Calculation History',
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+          headerTitle: 'Settings',
+        }}
+      />
+    </Tabs>
+  );
+}
