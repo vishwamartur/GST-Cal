@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
+import { formatCurrency } from '@/utils/currency';
 
 interface ResultProps {
   result: {
@@ -11,12 +12,13 @@ interface ResultProps {
     netAmount: number;
     gstAmount: number;
     grossAmount: number;
+    currency?: string;
   };
 }
 
 export default function ResultCard({ result }: ResultProps) {
-  const formatCurrency = (value: number) => {
-    return `₹${value.toFixed(2)}`;
+  const formatAmount = (value: number) => {
+    return formatCurrency(value, result.currency || 'INR');
   };
 
   return (
@@ -28,43 +30,43 @@ export default function ResultCard({ result }: ResultProps) {
       </Text>
 
       <View style={styles.resultRow}>
-        <Animated.View 
+        <Animated.View
           entering={SlideInRight.delay(100).duration(500)}
           style={styles.resultItem}
         >
           <Text style={styles.resultLabel}>Net Amount</Text>
-          <Text style={styles.resultValue}>{formatCurrency(result.netAmount)}</Text>
+          <Text style={styles.resultValue}>{formatAmount(result.netAmount)}</Text>
         </Animated.View>
       </View>
 
       <View style={styles.resultRow}>
-        <Animated.View 
+        <Animated.View
           entering={SlideInRight.delay(200).duration(500)}
           style={styles.resultItem}
         >
           <Text style={styles.resultLabel}>GST Amount</Text>
-          <Text style={styles.resultValue}>{formatCurrency(result.gstAmount)}</Text>
+          <Text style={styles.resultValue}>{formatAmount(result.gstAmount)}</Text>
         </Animated.View>
       </View>
 
       <View style={[styles.resultRow, styles.totalRow]}>
-        <Animated.View 
+        <Animated.View
           entering={SlideInRight.delay(300).duration(500)}
           style={styles.resultItem}
         >
           <Text style={styles.totalLabel}>Gross Amount</Text>
-          <Text style={styles.totalValue}>{formatCurrency(result.grossAmount)}</Text>
+          <Text style={styles.totalValue}>{formatAmount(result.grossAmount)}</Text>
         </Animated.View>
       </View>
 
-      <Animated.View 
+      <Animated.View
         entering={FadeIn.delay(400).duration(500)}
         style={styles.info}
       >
         <Text style={styles.infoText}>
-          {result.isInclusive 
-            ? `You entered a price of ${formatCurrency(result.amount)} including GST.`
-            : `You entered a price of ${formatCurrency(result.amount)} excluding GST.`}
+          {result.isInclusive
+            ? `You entered a price of ${formatAmount(result.amount)} including GST.`
+            : `You entered a price of ${formatAmount(result.amount)} excluding GST.`}
         </Text>
       </Animated.View>
     </View>

@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert } from 'react-native';
-import { savePreferences, getPreferences, clearHistory } from '@/utils/storage';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, useColorScheme, Share } from 'react-native';
+import { savePreferences, getPreferences, clearHistory, getCalculationHistory } from '@/utils/storage';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import GSTSelector from '@/components/GSTSelector';
-import { Info, Trash2 } from 'lucide-react-native';
+import CurrencySelector from '@/components/CurrencySelector';
+import { Info, Trash2, Download, Moon } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [defaultGSTRate, setDefaultGSTRate] = useState(18);
   const [saveHistory, setSaveHistory] = useState(true);
   const [defaultCalculationMode, setDefaultCalculationMode] = useState<'inclusive' | 'exclusive'>('exclusive');
+  const [defaultCurrency, setDefaultCurrency] = useState('INR');
+  const [darkMode, setDarkMode] = useState(false);
+  const systemColorScheme = useColorScheme();
 
   useEffect(() => {
     loadPreferences();
@@ -23,6 +27,12 @@ export default function SettingsScreen() {
         if (prefs.defaultCalculationMode) {
           setDefaultCalculationMode(prefs.defaultCalculationMode);
         }
+        if (prefs.defaultCurrency) {
+          setDefaultCurrency(prefs.defaultCurrency);
+        }
+        if (prefs.darkMode !== undefined) {
+          setDarkMode(prefs.darkMode);
+        }
       }
     } catch (error) {
       console.error('Failed to load preferences:', error);
@@ -35,11 +45,50 @@ export default function SettingsScreen() {
         defaultGSTRate,
         saveHistory,
         defaultCalculationMode,
+        defaultCurrency,
+        darkMode,
       });
       Alert.alert('Success', 'Your preferences have been saved.');
     } catch (error) {
       console.error('Failed to save preferences:', error);
       Alert.alert('Error', 'Failed to save preferences.');
+    }
+  };
+
+  const handleExportHistory = async () => {
+    try {
+      const history = await getCalculationHistory();
+      if (!history || history.length === 0) {
+        Alert.alert('No Data', 'There is no calculation history to export.');
+        return;
+      }
+
+      // Convert history to CSV format
+      let csvContent = 'Date,Description,Amount,GST Rate,Is Inclusive,Net Amount,GST Amount,Gross Amount\n';
+
+      history.forEach(item => {
+        const date = new Date(item.timestamp).toLocaleDateString();
+        const row = [
+          date,
+          `"${item.description}"`,
+          item.amount,
+          item.gstRate,
+          item.isInclusive ? 'Yes' : 'No',
+          item.netAmount,
+          item.gstAmount,
+          item.grossAmount
+        ].join(',');
+        csvContent += row + '\n';
+      });
+
+      // Share the CSV content
+      await Share.share({
+        message: csvContent,
+        title: 'GST Calculator History',
+      });
+    } catch (error) {
+      console.error('Failed to export history:', error);
+      Alert.alert('Error', 'Failed to export calculation history.');
     }
   };
 
@@ -116,6 +165,29 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Default Currency</Text>
+          <CurrencySelector
+            selectedCurrency={defaultCurrency}
+            onCurrencyChange={setDefaultCurrency}
+          />
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Dark Mode</Text>
+            <Switch
+              value={darkMode}
+              onValueChange={setDarkMode}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={darkMode ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            {darkMode ? 'Using dark theme' : `Using ${systemColorScheme === 'dark' ? 'light' : systemColorScheme} theme`}
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
           <View style={styles.settingRow}>
             <Text style={styles.settingLabel}>Save Calculation History</Text>
             <Switch
@@ -133,7 +205,13 @@ export default function SettingsScreen() {
 
       <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.section}>
         <Text style={styles.sectionTitle}>Data Management</Text>
-        <TouchableOpacity style={styles.dataButton} onPress={handleClearHistory}>
+
+        <TouchableOpacity style={styles.dataButtonExport} onPress={handleExportHistory}>
+          <Download size={20} color="#1A237E" />
+          <Text style={styles.dataButtonTextExport}>Export Calculation History</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.dataButton, { marginTop: 12 }]} onPress={handleClearHistory}>
           <Trash2 size={20} color="#FF5252" />
           <Text style={styles.dataButtonTextDanger}>Clear Calculation History</Text>
         </TouchableOpacity>
@@ -248,8 +326,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
   },
+  dataButtonExport: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8EAF6',
+    borderRadius: 8,
+    padding: 16,
+  },
   dataButtonTextDanger: {
     color: '#FF5252',
+    fontWeight: '500',
+    marginLeft: 12,
+  },
+  dataButtonTextExport: {
+    color: '#1A237E',
     fontWeight: '500',
     marginLeft: 12,
   },

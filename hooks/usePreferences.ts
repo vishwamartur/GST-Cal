@@ -5,6 +5,8 @@ interface UsePreferencesReturn {
   defaultGSTRate: number;
   defaultCalculationMode: 'inclusive' | 'exclusive';
   saveHistory: boolean;
+  defaultCurrency: string;
+  darkMode: boolean;
   isLoading: boolean;
 }
 
@@ -31,6 +33,8 @@ export function useSavedPreferences(): UsePreferencesReturn {
     defaultGSTRate: preferences?.defaultGSTRate ?? 18,
     defaultCalculationMode: preferences?.defaultCalculationMode ?? 'exclusive',
     saveHistory: preferences?.saveHistory !== false, // Default to true
+    defaultCurrency: preferences?.defaultCurrency ?? 'INR',
+    darkMode: preferences?.darkMode ?? false,
     isLoading,
   };
 }

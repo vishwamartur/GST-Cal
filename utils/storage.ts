@@ -13,12 +13,15 @@ export interface Calculation {
   netAmount: number;
   gstAmount: number;
   grossAmount: number;
+  currency?: string;
 }
 
 export interface Preferences {
   defaultGSTRate: number;
   saveHistory: boolean;
   defaultCalculationMode?: 'inclusive' | 'exclusive';
+  defaultCurrency?: string;
+  darkMode?: boolean;
 }
 
 // Get preferences

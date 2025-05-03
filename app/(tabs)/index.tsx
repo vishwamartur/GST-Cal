@@ -19,10 +19,11 @@ import { useSavedPreferences } from '@/hooks/usePreferences';
 import { ArrowRight, Share2 } from 'lucide-react-native';
 import GSTSelector from '@/components/GSTSelector';
 import ResultCard from '@/components/ResultCard';
+import { getCurrencySymbol, formatCurrency } from '@/utils/currency';
 
 export default function CalculatorScreen() {
   const router = useRouter();
-  const { defaultGSTRate, defaultCalculationMode } = useSavedPreferences();
+  const { defaultGSTRate, defaultCalculationMode, defaultCurrency } = useSavedPreferences();
 
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -78,6 +79,7 @@ export default function CalculatorScreen() {
       netAmount,
       gstAmount,
       grossAmount,
+      currency: defaultCurrency,
     };
 
     setResult(calculationResult);
@@ -89,13 +91,15 @@ export default function CalculatorScreen() {
     if (!result) return;
 
     try {
+      const currencySymbol = getCurrencySymbol(result.currency || defaultCurrency);
+
       const message =
         `GST Calculation for ${result.description}\n\n` +
-        `Amount: ₹${result.amount.toFixed(2)}\n` +
+        `Amount: ${formatCurrency(result.amount, result.currency || defaultCurrency)}\n` +
         `GST Rate: ${result.gstRate}%\n` +
-        `Net Amount: ₹${result.netAmount.toFixed(2)}\n` +
-        `GST Amount: ₹${result.gstAmount.toFixed(2)}\n` +
-        `Gross Amount: ₹${result.grossAmount.toFixed(2)}`;
+        `Net Amount: ${formatCurrency(result.netAmount, result.currency || defaultCurrency)}\n` +
+        `GST Amount: ${formatCurrency(result.gstAmount, result.currency || defaultCurrency)}\n` +
+        `Gross Amount: ${formatCurrency(result.grossAmount, result.currency || defaultCurrency)}`;
 
       await Share.share({
         message,
@@ -125,7 +129,7 @@ export default function CalculatorScreen() {
             placeholderTextColor="#9E9E9E"
           />
 
-          <Text style={styles.label}>Amount (₹)</Text>
+          <Text style={styles.label}>Amount ({getCurrencySymbol(defaultCurrency)})</Text>
           <TextInput
             style={styles.input}
             placeholder="0.00"
