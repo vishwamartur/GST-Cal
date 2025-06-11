@@ -11,6 +11,8 @@ interface ResultProps {
     gstRate: number;
     netAmount: number;
     gstAmount: number;
+    cgstAmount: number;
+    sgstAmount: number;
     grossAmount: number;
     currency?: string;
   };
@@ -44,14 +46,24 @@ export default function ResultCard({ result }: ResultProps) {
           entering={SlideInRight.delay(200).duration(500)}
           style={styles.resultItem}
         >
-          <Text style={styles.resultLabel}>GST Amount</Text>
-          <Text style={styles.resultValue}>{formatAmount(result.gstAmount)}</Text>
+          <Text style={styles.resultLabel}>CGST ({result.gstRate / 2}%)</Text>
+          <Text style={styles.resultValue}>{formatAmount(result.cgstAmount)}</Text>
+        </Animated.View>
+      </View>
+
+      <View style={styles.resultRow}>
+        <Animated.View
+          entering={SlideInRight.delay(250).duration(500)}
+          style={styles.resultItem}
+        >
+          <Text style={styles.resultLabel}>SGST ({result.gstRate / 2}%)</Text>
+          <Text style={styles.resultValue}>{formatAmount(result.sgstAmount)}</Text>
         </Animated.View>
       </View>
 
       <View style={[styles.resultRow, styles.totalRow]}>
         <Animated.View
-          entering={SlideInRight.delay(300).duration(500)}
+          entering={SlideInRight.delay(350).duration(500)}
           style={styles.resultItem}
         >
           <Text style={styles.totalLabel}>Gross Amount</Text>
@@ -60,7 +72,7 @@ export default function ResultCard({ result }: ResultProps) {
       </View>
 
       <Animated.View
-        entering={FadeIn.delay(400).duration(500)}
+        entering={FadeIn.delay(450).duration(500)}
         style={styles.info}
       >
         <Text style={styles.infoText}>

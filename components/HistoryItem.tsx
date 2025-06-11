@@ -34,13 +34,19 @@ export default function HistoryItem({ item }: HistoryItemProps) {
 
   const handleShare = async () => {
     try {
-      const message = 
+      // Handle backward compatibility for items without CGST/SGST fields
+      const cgstAmount = item.cgstAmount ?? item.gstAmount / 2;
+      const sgstAmount = item.sgstAmount ?? item.gstAmount / 2;
+
+      const message =
         `GST Calculation for ${item.description}\n\n` +
         `Amount: ₹${item.amount.toFixed(2)}\n` +
         `GST Rate: ${item.gstRate}%\n` +
         `Calculation Type: ${item.isInclusive ? 'Inclusive' : 'Exclusive'}\n\n` +
         `Net Amount: ₹${item.netAmount.toFixed(2)}\n` +
-        `GST Amount: ₹${item.gstAmount.toFixed(2)}\n` +
+        `CGST (${item.gstRate / 2}%): ₹${cgstAmount.toFixed(2)}\n` +
+        `SGST (${item.gstRate / 2}%): ₹${sgstAmount.toFixed(2)}\n` +
+        `Total GST: ₹${item.gstAmount.toFixed(2)}\n` +
         `Gross Amount: ₹${item.grossAmount.toFixed(2)}`;
 
       await Share.share({
@@ -73,12 +79,17 @@ export default function HistoryItem({ item }: HistoryItemProps) {
           <Text style={styles.amountLabel}>Net</Text>
           <Text style={styles.amountValue}>{formatCurrency(item.netAmount)}</Text>
         </View>
-        
+
         <View style={styles.amountItem}>
-          <Text style={styles.amountLabel}>GST</Text>
-          <Text style={styles.amountValue}>{formatCurrency(item.gstAmount)}</Text>
+          <Text style={styles.amountLabel}>CGST</Text>
+          <Text style={styles.amountValue}>{formatCurrency(item.cgstAmount ?? item.gstAmount / 2)}</Text>
         </View>
-        
+
+        <View style={styles.amountItem}>
+          <Text style={styles.amountLabel}>SGST</Text>
+          <Text style={styles.amountValue}>{formatCurrency(item.sgstAmount ?? item.gstAmount / 2)}</Text>
+        </View>
+
         <View style={styles.amountItem}>
           <Text style={styles.totalLabel}>Gross</Text>
           <Text style={styles.totalValue}>{formatCurrency(item.grossAmount)}</Text>
@@ -140,6 +151,7 @@ const styles = StyleSheet.create({
   amountItem: {
     flex: 1,
     alignItems: 'center',
+    minWidth: 60,
   },
   amountLabel: {
     fontSize: 12,
