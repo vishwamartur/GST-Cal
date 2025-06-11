@@ -41,29 +41,34 @@ export default function ResultCard({ result }: ResultProps) {
         </Animated.View>
       </View>
 
-      <View style={styles.resultRow}>
-        <Animated.View
-          entering={SlideInRight.delay(200).duration(500)}
-          style={styles.resultItem}
-        >
-          <Text style={styles.resultLabel}>CGST ({result.gstRate / 2}%)</Text>
-          <Text style={styles.resultValue}>{formatAmount(result.cgstAmount)}</Text>
-        </Animated.View>
-      </View>
+      {/* GST Breakdown Section */}
+      <Animated.View
+        entering={SlideInRight.delay(200).duration(500)}
+        style={styles.gstBreakdownSection}
+      >
+        <Text style={styles.gstBreakdownTitle}>GST Breakdown ({result.gstRate}%)</Text>
 
-      <View style={styles.resultRow}>
-        <Animated.View
-          entering={SlideInRight.delay(250).duration(500)}
-          style={styles.resultItem}
-        >
-          <Text style={styles.resultLabel}>SGST ({result.gstRate / 2}%)</Text>
-          <Text style={styles.resultValue}>{formatAmount(result.sgstAmount)}</Text>
-        </Animated.View>
-      </View>
+        <View style={styles.gstBreakdownContainer}>
+          <View style={styles.gstComponentRow}>
+            <Text style={styles.gstComponentLabel}>CGST ({result.gstRate / 2}%)</Text>
+            <Text style={styles.gstComponentValue}>{formatAmount(result.cgstAmount)}</Text>
+          </View>
+
+          <View style={styles.gstComponentRow}>
+            <Text style={styles.gstComponentLabel}>SGST ({result.gstRate / 2}%)</Text>
+            <Text style={styles.gstComponentValue}>{formatAmount(result.sgstAmount)}</Text>
+          </View>
+
+          <View style={styles.gstTotalRow}>
+            <Text style={styles.gstTotalLabel}>Total GST</Text>
+            <Text style={styles.gstTotalValue}>{formatAmount(result.gstAmount)}</Text>
+          </View>
+        </View>
+      </Animated.View>
 
       <View style={[styles.resultRow, styles.totalRow]}>
         <Animated.View
-          entering={SlideInRight.delay(350).duration(500)}
+          entering={SlideInRight.delay(300).duration(500)}
           style={styles.resultItem}
         >
           <Text style={styles.totalLabel}>Gross Amount</Text>
@@ -72,7 +77,7 @@ export default function ResultCard({ result }: ResultProps) {
       </View>
 
       <Animated.View
-        entering={FadeIn.delay(450).duration(500)}
+        entering={FadeIn.delay(400).duration(500)}
         style={styles.info}
       >
         <Text style={styles.infoText}>
@@ -132,6 +137,61 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#212121',
     fontWeight: '600',
+  },
+  gstBreakdownSection: {
+    backgroundColor: '#F8F9FF',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: '#1A237E',
+  },
+  gstBreakdownTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1A237E',
+    marginBottom: 8,
+  },
+  gstBreakdownContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 6,
+    padding: 8,
+  },
+  gstComponentRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+  gstComponentLabel: {
+    fontSize: 14,
+    color: '#424242',
+  },
+  gstComponentValue: {
+    fontSize: 15,
+    color: '#212121',
+    fontWeight: '500',
+  },
+  gstTotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    marginTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+  },
+  gstTotalLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A237E',
+  },
+  gstTotalValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A237E',
   },
   totalRow: {
     borderBottomWidth: 0,
