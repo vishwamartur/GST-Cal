@@ -19,8 +19,15 @@
     "deploy:firebase": "firebase deploy",
     "build:android:preview": "eas build -p android --profile preview",
     "build:android:prod": "eas build -p android --profile production",
+    "build:android:apk": "eas build -p android --profile production-apk",
     "build:ios:preview": "eas build -p ios --profile preview",
-    "build:ios:prod": "eas build -p ios --profile production"
+    "build:ios:prod": "eas build -p ios --profile production",
+    "build:all:preview": "eas build --platform all --profile preview",
+    "build:all:prod": "eas build --platform all --profile production",
+    "deploy:expo": "expo publish",
+    "submit:android": "eas submit -p android",
+    "submit:ios": "eas submit -p ios",
+    "update": "expo install --fix"
   },
   "dependencies": {
     "@expo/cli": "^0.24.14",
@@ -38,7 +45,7 @@
     "expo-haptics": "^14.0.1",
     "expo-linear-gradient": "^14.0.2",
     "expo-linking": "^7.0.5",
-    "expo-router": "~4.0.20",
+    "expo-router": "~4.0.21",
     "expo-splash-screen": "~0.29.24",
     "expo-status-bar": "^2.0.1",
     "expo-symbols": "^0.2.2",
@@ -62,6 +69,7 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
+    "eas-cli": "^16.9.0",
     "typescript": "^5.3.3"
   }
 }
