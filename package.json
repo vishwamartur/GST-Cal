@@ -27,7 +27,9 @@
     "deploy:expo": "expo publish",
     "submit:android": "eas submit -p android",
     "submit:ios": "eas submit -p ios",
-    "update": "expo install --fix"
+    "update": "expo install --fix",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/cli": "^0.24.14",
