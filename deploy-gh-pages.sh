@@ -14,7 +14,7 @@ git add .
 git commit -m "Deploy to GitHub Pages"
 
 # Push to the gh-pages branch
-git push --force git@github.com:USERNAME/REPO_NAME.git master:gh-pages
+git push --force https://github.com/vishwamartur/GST-Cal.git master:gh-pages
 
 # Clean up
 cd ..

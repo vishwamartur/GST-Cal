@@ -74,25 +74,37 @@ export default function HistoryItem({ item }: HistoryItemProps) {
         </Text>
       </View>
       
+      {/* Main amounts row */}
       <View style={styles.amountRow}>
         <View style={styles.amountItem}>
-          <Text style={styles.amountLabel}>Net</Text>
+          <Text style={styles.amountLabel}>Net Amount</Text>
           <Text style={styles.amountValue}>{formatCurrency(item.netAmount)}</Text>
         </View>
 
         <View style={styles.amountItem}>
-          <Text style={styles.amountLabel}>CGST</Text>
-          <Text style={styles.amountValue}>{formatCurrency(item.cgstAmount ?? item.gstAmount / 2)}</Text>
-        </View>
-
-        <View style={styles.amountItem}>
-          <Text style={styles.amountLabel}>SGST</Text>
-          <Text style={styles.amountValue}>{formatCurrency(item.sgstAmount ?? item.gstAmount / 2)}</Text>
-        </View>
-
-        <View style={styles.amountItem}>
-          <Text style={styles.totalLabel}>Gross</Text>
+          <Text style={styles.totalLabel}>Gross Amount</Text>
           <Text style={styles.totalValue}>{formatCurrency(item.grossAmount)}</Text>
+        </View>
+      </View>
+
+      {/* GST breakdown section */}
+      <View style={styles.gstBreakdownSection}>
+        <Text style={styles.gstBreakdownTitle}>GST Breakdown ({item.gstRate}%)</Text>
+        <View style={styles.gstBreakdownRow}>
+          <View style={styles.gstItem}>
+            <Text style={styles.gstLabel}>CGST ({item.gstRate / 2}%)</Text>
+            <Text style={styles.gstValue}>{formatCurrency(item.cgstAmount ?? item.gstAmount / 2)}</Text>
+          </View>
+
+          <View style={styles.gstItem}>
+            <Text style={styles.gstLabel}>SGST ({item.gstRate / 2}%)</Text>
+            <Text style={styles.gstValue}>{formatCurrency(item.sgstAmount ?? item.gstAmount / 2)}</Text>
+          </View>
+
+          <View style={styles.gstItem}>
+            <Text style={styles.gstTotalLabel}>Total GST</Text>
+            <Text style={styles.gstTotalValue}>{formatCurrency(item.gstAmount)}</Text>
+          </View>
         </View>
       </View>
     </View>
@@ -151,7 +163,6 @@ const styles = StyleSheet.create({
   amountItem: {
     flex: 1,
     alignItems: 'center',
-    minWidth: 60,
   },
   amountLabel: {
     fontSize: 12,
@@ -159,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   amountValue: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '500',
     color: '#424242',
   },
@@ -170,7 +181,51 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   totalValue: {
-    fontSize: 15,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A237E',
+  },
+  gstBreakdownSection: {
+    backgroundColor: '#F8F9FF',
+    borderRadius: 6,
+    padding: 8,
+    marginTop: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: '#1A237E',
+  },
+  gstBreakdownTitle: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1A237E',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  gstBreakdownRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  gstItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  gstLabel: {
+    fontSize: 10,
+    color: '#424242',
+    marginBottom: 2,
+  },
+  gstValue: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#212121',
+  },
+  gstTotalLabel: {
+    fontSize: 10,
+    color: '#1A237E',
+    marginBottom: 2,
+    fontWeight: '600',
+  },
+  gstTotalValue: {
+    fontSize: 12,
     fontWeight: '700',
     color: '#1A237E',
   },
