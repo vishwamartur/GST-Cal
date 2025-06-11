@@ -2,6 +2,15 @@
 
 This document provides instructions for deploying the GST Calculator application to various platforms.
 
+## 🚀 Current Deployment Status
+
+### Live Web Application
+- **URL**: https://vishwamartur.github.io/GST-Cal/
+- **Status**: ✅ Live and Active
+- **Platform**: GitHub Pages
+- **Last Deployed**: June 11, 2025
+- **Features**: Full GST calculator with CGST/SGST separation
+
 ## Web Deployment
 
 ### Local Testing
@@ -20,14 +29,18 @@ This document provides instructions for deploying the GST Calculator application
 
 ### Deploy to GitHub Pages
 
-1. Update the `deploy-gh-pages.sh` script with your GitHub username and repository name.
+1. The deployment script is already configured for this repository.
 
 2. Run the deployment script:
+   ```
+   npm run deploy:gh-pages
+   ```
+   or
    ```
    ./deploy-gh-pages.sh
    ```
 
-3. Your application will be available at `https://[username].github.io/[repository-name]`
+3. Your application will be available at: https://vishwamartur.github.io/GST-Cal/
 
 ### Deploy to Firebase Hosting
 
