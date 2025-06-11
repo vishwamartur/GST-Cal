@@ -12,6 +12,8 @@ export interface Calculation {
   gstRate: number;
   netAmount: number;
   gstAmount: number;
+  cgstAmount: number;
+  sgstAmount: number;
   grossAmount: number;
   currency?: string;
 }

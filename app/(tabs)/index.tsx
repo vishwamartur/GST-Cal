@@ -56,7 +56,7 @@ export default function CalculatorScreen() {
     const numAmount = parseFloat(amount);
     const gstRate = selectedGST / 100;
 
-    let netAmount, gstAmount, grossAmount;
+    let netAmount, gstAmount, grossAmount, cgstAmount, sgstAmount;
 
     if (isInclusive) {
       // Inclusive calculation (amount includes GST)
@@ -70,6 +70,10 @@ export default function CalculatorScreen() {
       grossAmount = netAmount + gstAmount;
     }
 
+    // Split GST into CGST and SGST (each is half of total GST)
+    cgstAmount = gstAmount / 2;
+    sgstAmount = gstAmount / 2;
+
     const calculationResult = {
       timestamp: new Date().toISOString(),
       description: description || 'Unnamed Item',
@@ -78,6 +82,8 @@ export default function CalculatorScreen() {
       gstRate: selectedGST,
       netAmount,
       gstAmount,
+      cgstAmount,
+      sgstAmount,
       grossAmount,
       currency: defaultCurrency,
     };
@@ -98,7 +104,9 @@ export default function CalculatorScreen() {
         `Amount: ${formatCurrency(result.amount, result.currency || defaultCurrency)}\n` +
         `GST Rate: ${result.gstRate}%\n` +
         `Net Amount: ${formatCurrency(result.netAmount, result.currency || defaultCurrency)}\n` +
-        `GST Amount: ${formatCurrency(result.gstAmount, result.currency || defaultCurrency)}\n` +
+        `CGST (${result.gstRate / 2}%): ${formatCurrency(result.cgstAmount, result.currency || defaultCurrency)}\n` +
+        `SGST (${result.gstRate / 2}%): ${formatCurrency(result.sgstAmount, result.currency || defaultCurrency)}\n` +
+        `Total GST: ${formatCurrency(result.gstAmount, result.currency || defaultCurrency)}\n` +
         `Gross Amount: ${formatCurrency(result.grossAmount, result.currency || defaultCurrency)}`;
 
       await Share.share({
