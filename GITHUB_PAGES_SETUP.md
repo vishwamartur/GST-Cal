@@ -19,18 +19,34 @@ git commit -m "Add privacy policy and GitHub Pages deployment workflow"
 git push origin main
 ```
 
-### 2. Enable GitHub Pages
+### 2. Enable GitHub Pages (Fix Protection Rules)
 
+**Option A: Use Simple Deployment (Recommended)**
 1. Go to your GitHub repository: `https://github.com/vishwamartur/GST-Cal`
 2. Click on **Settings** tab
 3. Scroll down to **Pages** section in the left sidebar
-4. Under **Source**, select **GitHub Actions**
-5. Click **Save**
+4. Under **Source**, select **Deploy from a branch**
+5. Select **gh-pages** branch and **/ (root)** folder
+6. Click **Save**
+
+**Option B: Fix Environment Protection Rules**
+1. Go to **Settings** → **Environments**
+2. Click on **github-pages** environment
+3. Under **Environment protection rules**:
+   - Uncheck **Required reviewers** (if checked)
+   - Add **main** to **Deployment branches** if restricted
+4. Click **Save protection rules**
+5. Go back to **Pages** settings and select **GitHub Actions**
 
 ### 3. Trigger Deployment
 
-The deployment will automatically trigger when you push the files. You can also manually trigger it:
+**For Simple Deployment (Recommended):**
+1. Go to **Actions** tab in your repository
+2. Select **Deploy Privacy Policy (Simple)** workflow
+3. Click **Run workflow** button
+4. Select the main branch and click **Run workflow**
 
+**For GitHub Actions Deployment:**
 1. Go to **Actions** tab in your repository
 2. Select **Deploy Privacy Policy to GitHub Pages** workflow
 3. Click **Run workflow** button
@@ -85,20 +101,35 @@ Your privacy policy will be available in multiple formats:
 
 ## 🔧 Troubleshooting
 
+### Environment Protection Rules Error
+**Error:** "Branch 'main' is not allowed to deploy to github-pages due to environment protection rules"
+
+**Solution 1 (Recommended):** Use the simple deployment workflow
+1. Use the **Deploy Privacy Policy (Simple)** workflow instead
+2. Set GitHub Pages source to **Deploy from a branch** → **gh-pages**
+
+**Solution 2:** Fix environment protection rules
+1. Go to **Settings** → **Environments** → **github-pages**
+2. Remove or modify protection rules
+3. Add **main** branch to allowed deployment branches
+
 ### Deployment Failed
 1. Check the **Actions** tab for error details
 2. Ensure GitHub Pages is enabled in repository settings
 3. Verify the workflow file syntax
+4. Try the simple deployment workflow if the main one fails
 
 ### Page Not Loading
 1. Wait 5-10 minutes after first deployment
-2. Check if GitHub Pages is set to "GitHub Actions" source
+2. Check if GitHub Pages source is correctly set
 3. Verify the repository is public or you have GitHub Pro
+4. Check if the **gh-pages** branch was created
 
 ### Update Not Reflecting
 1. Clear browser cache
 2. Check if the workflow ran successfully
 3. Verify changes were committed to the main branch
+4. Check if the **gh-pages** branch was updated
 
 ## ✅ Verification
 

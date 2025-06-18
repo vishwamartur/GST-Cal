@@ -1,0 +1,139 @@
+name: Deploy Privacy Policy (Simple)
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'PRIVACY_POLICY.txt'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create docs directory
+        run: mkdir -p docs
+
+      - name: Convert privacy policy to HTML
+        run: |
+          cat > docs/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>GST Calculator - Privacy Policy</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                      line-height: 1.6;
+                      max-width: 800px;
+                      margin: 0 auto;
+                      padding: 20px;
+                      color: #333;
+                      background-color: #f9f9f9;
+                  }
+                  .container {
+                      background: white;
+                      padding: 40px;
+                      border-radius: 10px;
+                      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                  }
+                  h1 {
+                      color: #1A237E;
+                      text-align: center;
+                      border-bottom: 3px solid #1A237E;
+                      padding-bottom: 10px;
+                      margin-bottom: 30px;
+                  }
+                  h2 {
+                      color: #1A237E;
+                      margin-top: 30px;
+                      margin-bottom: 15px;
+                  }
+                  h3 {
+                      color: #333;
+                      margin-top: 20px;
+                      margin-bottom: 10px;
+                  }
+                  .summary {
+                      background-color: #f0f8ff;
+                      padding: 20px;
+                      border-radius: 8px;
+                      border: 1px solid #1A237E;
+                      margin: 30px 0;
+                  }
+                  .checkmark {
+                      color: #4CAF50;
+                      font-weight: bold;
+                  }
+                  .footer {
+                      text-align: center;
+                      margin-top: 40px;
+                      padding-top: 20px;
+                      border-top: 1px solid #ddd;
+                      color: #666;
+                      font-size: 0.9em;
+                  }
+                  ul {
+                      margin-bottom: 15px;
+                  }
+                  li {
+                      margin-bottom: 5px;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+          EOF
+
+          # Convert the privacy policy text to HTML
+          echo "<h1>GST Calculator - Privacy Policy</h1>" >> docs/index.html
+          echo "<div style='text-align: center; font-style: italic; color: #666; margin-bottom: 20px;'>Last updated: $(date +'%B %d, %Y')</div>" >> docs/index.html
+          
+          # Process the privacy policy content
+          sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' PRIVACY_POLICY.txt | \
+          sed '1d' | \
+          sed 's/^Last updated:.*$//' | \
+          sed 's/^$//' | \
+          sed '/^$/N;/^\n$/d' | \
+          sed 's/^INFORMATION WE COLLECT$/<h2>INFORMATION WE COLLECT<\/h2>/' | \
+          sed 's/^HOW WE USE INFORMATION$/<h2>HOW WE USE INFORMATION<\/h2>/' | \
+          sed 's/^DATA SECURITY$/<h2>DATA SECURITY<\/h2>/' | \
+          sed 's/^YOUR RIGHTS$/<h2>YOUR RIGHTS<\/h2>/' | \
+          sed 's/^CHILDREN'\''S PRIVACY$/<h2>CHILDREN'\''S PRIVACY<\/h2>/' | \
+          sed 's/^CHANGES TO THIS PRIVACY POLICY$/<h2>CHANGES TO THIS PRIVACY POLICY<\/h2>/' | \
+          sed 's/^CONTACT US$/<h2>CONTACT US<\/h2>/' | \
+          sed 's/^COMPLIANCE$/<h2>COMPLIANCE<\/h2>/' | \
+          sed 's/^SUMMARY$/<h2>SUMMARY<\/h2>/' | \
+          sed 's/^[A-Za-z][^:]*:$/<h3>&<\/h3>/' | \
+          sed 's/^- /<li>/' | \
+          sed 's/^✓/<div class="checkmark">✓/' | \
+          sed 's/^[^<].*[^>]$/<p>&<\/p>/' | \
+          sed 's/<p><h/<h/g' | \
+          sed 's/<\/h[0-9]><\/p>/<\/h2>/g' >> docs/index.html
+
+          cat >> docs/index.html << 'EOF'
+              </div>
+              <div class="footer">
+                  <p>This privacy policy is automatically deployed via GitHub Actions</p>
+                  <p>Available formats: <a href="privacy-policy.txt">Raw Text</a></p>
+              </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Copy privacy policy text file
+        run: cp PRIVACY_POLICY.txt docs/privacy-policy.txt
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
+          publish_branch: gh-pages
+          force_orphan: true
