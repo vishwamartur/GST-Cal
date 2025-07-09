@@ -1,4 +1,6 @@
-# GST Calculator - Privacy Policy
+# Privacy Policy
+
+**GST Calculator**
 
 **Last updated: December 17, 2024**
 
@@ -110,19 +112,6 @@ This app complies with:
 > **Your privacy and data security are our top priorities.**
 
 ---
-
-## 📱 Download GST Calculator
-
-- **Android:** [Google Play Store](https://play.google.com/store/apps/details?id=com.yourcompany.gstcalculator)
-- **iOS:** [App Store](https://apps.apple.com/app/gst-calculator)
-
----
-
-## 🔗 Additional Resources
-
-- [App Features & Screenshots](README_BACKUP.md)
-- [Technical Documentation](DEPLOYMENT.md)
-- [Source Code](https://github.com/vishwamartur/GST-Cal)
 
 ---
 
