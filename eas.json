@@ -7,13 +7,19 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "compileSdkVersion": 35,
+        "targetSdkVersion": 35,
+        "buildToolsVersion": "35.0.0"
       }
     },
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "compileSdkVersion": 35,
+        "targetSdkVersion": 35,
+        "buildToolsVersion": "35.0.0"
       },
       "ios": {
         "simulator": true
@@ -21,13 +27,19 @@
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "compileSdkVersion": 35,
+        "targetSdkVersion": 35,
+        "buildToolsVersion": "35.0.0"
       }
     },
     "production-apk": {
       "extends": "production",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "compileSdkVersion": 35,
+        "targetSdkVersion": 35,
+        "buildToolsVersion": "35.0.0"
       }
     }
   },
