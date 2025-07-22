@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, useColorScheme, Share } from 'react-native';
 import { savePreferences, getPreferences, clearHistory, getCalculationHistory } from '@/utils/storage';
 import { getReminderSettings, saveReminderSettings, ReminderSettings } from '@/utils/reminderStorage';
+import { getMarginSettings, saveMarginSettings, ProfitMarginSettings, clearAllMarginData } from '@/utils/profitMarginStorage';
 import { requestNotificationPermissions } from '@/utils/notificationService';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import GSTSelector from '@/components/GSTSelector';
 import CurrencySelector from '@/components/CurrencySelector';
-import { Info, Trash2, Download, Moon, Bell, Building, DollarSign } from 'lucide-react-native';
+import { Info, Trash2, Download, Moon, Bell, Building, DollarSign, TrendingUp } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [defaultGSTRate, setDefaultGSTRate] = useState(18);
@@ -25,9 +26,20 @@ export default function SettingsScreen() {
     emailReminders: false,
   });
 
+  // Profit Margin Settings
+  const [marginSettings, setMarginSettings] = useState<ProfitMarginSettings>({
+    defaultBusinessType: 'B2C',
+    defaultGSTRate: 18,
+    showBreakdownByDefault: true,
+    autoSaveCalculations: true,
+    preferredCurrency: '₹',
+    volumeDiscountEnabled: false,
+  });
+
   useEffect(() => {
     loadPreferences();
     loadReminderSettings();
+    loadMarginSettings();
   }, []);
 
   const loadPreferences = async () => {
@@ -60,6 +72,15 @@ export default function SettingsScreen() {
     }
   };
 
+  const loadMarginSettings = async () => {
+    try {
+      const settings = await getMarginSettings();
+      setMarginSettings(settings);
+    } catch (error) {
+      console.error('Failed to load margin settings:', error);
+    }
+  };
+
   const handleSavePreferences = async () => {
     try {
       await savePreferences({
@@ -70,6 +91,7 @@ export default function SettingsScreen() {
         darkMode,
       });
       await saveReminderSettings(reminderSettings);
+      await saveMarginSettings(marginSettings);
       Alert.alert('Success', 'Your preferences have been saved.');
     } catch (error) {
       console.error('Failed to save preferences:', error);
@@ -134,6 +156,33 @@ export default function SettingsScreen() {
 
   const updateReminderSettings = (updates: Partial<ReminderSettings>) => {
     setReminderSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const updateMarginSettings = (updates: Partial<ProfitMarginSettings>) => {
+    setMarginSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleClearMarginData = () => {
+    Alert.alert(
+      'Clear Profit Margin Data',
+      'Are you sure you want to clear all profit margin calculations, presets, and settings?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await clearAllMarginData();
+              await loadMarginSettings(); // Reload default settings
+              Alert.alert('Success', 'All profit margin data cleared successfully!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear profit margin data');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleClearHistory = () => {
@@ -320,6 +369,96 @@ export default function SettingsScreen() {
         </View>
       </Animated.View>
 
+      <Animated.View entering={FadeInDown.delay(175).duration(500)} style={styles.section}>
+        <Text style={styles.sectionTitle}>Profit Margin Calculator</Text>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Default Business Type</Text>
+          <View style={styles.businessTypeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                marginSettings.defaultBusinessType === 'B2B' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateMarginSettings({ defaultBusinessType: 'B2B' })}
+            >
+              <Building size={16} color={marginSettings.defaultBusinessType === 'B2B' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  marginSettings.defaultBusinessType === 'B2B' && styles.businessTypeTextSelected,
+                ]}
+              >
+                B2B
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                marginSettings.defaultBusinessType === 'B2C' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateMarginSettings({ defaultBusinessType: 'B2C' })}
+            >
+              <DollarSign size={16} color={marginSettings.defaultBusinessType === 'B2C' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  marginSettings.defaultBusinessType === 'B2C' && styles.businessTypeTextSelected,
+                ]}
+              >
+                B2C
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Auto-save Calculations</Text>
+            <Switch
+              value={marginSettings.autoSaveCalculations}
+              onValueChange={(value) => updateMarginSettings({ autoSaveCalculations: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.autoSaveCalculations ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Automatically save profit margin calculations to history
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Show Breakdown by Default</Text>
+            <Switch
+              value={marginSettings.showBreakdownByDefault}
+              onValueChange={(value) => updateMarginSettings({ showBreakdownByDefault: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.showBreakdownByDefault ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Show detailed price breakdown in calculation results
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Volume Discounts</Text>
+            <Switch
+              value={marginSettings.volumeDiscountEnabled}
+              onValueChange={(value) => updateMarginSettings({ volumeDiscountEnabled: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.volumeDiscountEnabled ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Enable volume-based pricing calculations
+          </Text>
+        </View>
+      </Animated.View>
+
       <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.section}>
         <Text style={styles.sectionTitle}>Data Management</Text>
 
@@ -331,6 +470,11 @@ export default function SettingsScreen() {
         <TouchableOpacity style={[styles.dataButton, { marginTop: 12 }]} onPress={handleClearHistory}>
           <Trash2 size={20} color="#FF5252" />
           <Text style={styles.dataButtonTextDanger}>Clear Calculation History</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.dataButton, { marginTop: 12 }]} onPress={handleClearMarginData}>
+          <TrendingUp size={20} color="#FF5252" />
+          <Text style={styles.dataButtonTextDanger}>Clear Profit Margin Data</Text>
         </TouchableOpacity>
       </Animated.View>
 

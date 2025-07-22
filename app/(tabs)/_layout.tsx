@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Calculator, Clock, Settings, CalculatorIcon, Percent, Bell } from 'lucide-react-native';
+import { Calculator, Clock, Settings, CalculatorIcon, Percent, Bell, TrendingUp } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -45,6 +45,14 @@ export default function TabLayout() {
           title: 'History',
           tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
           headerTitle: 'Calculation History',
+        }}
+      />
+      <Tabs.Screen
+        name="profit-margin"
+        options={{
+          title: 'Profit Margin',
+          tabBarIcon: ({ color, size }) => <TrendingUp size={size} color={color} />,
+          headerTitle: 'Profit Margin Calculator',
         }}
       />
       <Tabs.Screen
