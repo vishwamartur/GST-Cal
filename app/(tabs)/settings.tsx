@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, useColorScheme, Share } from 'react-native';
 import { savePreferences, getPreferences, clearHistory, getCalculationHistory } from '@/utils/storage';
+import { getReminderSettings, saveReminderSettings, ReminderSettings } from '@/utils/reminderStorage';
+import { requestNotificationPermissions } from '@/utils/notificationService';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import GSTSelector from '@/components/GSTSelector';
 import CurrencySelector from '@/components/CurrencySelector';
-import { Info, Trash2, Download, Moon } from 'lucide-react-native';
+import { Info, Trash2, Download, Moon, Bell, Building, DollarSign } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [defaultGSTRate, setDefaultGSTRate] = useState(18);
@@ -14,8 +16,18 @@ export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const systemColorScheme = useColorScheme();
 
+  // GST Reminder Settings
+  const [reminderSettings, setReminderSettings] = useState<ReminderSettings>({
+    businessType: 'regular',
+    annualTurnover: 0,
+    reminderDays: [7, 3, 1],
+    notificationsEnabled: true,
+    emailReminders: false,
+  });
+
   useEffect(() => {
     loadPreferences();
+    loadReminderSettings();
   }, []);
 
   const loadPreferences = async () => {
@@ -39,6 +51,15 @@ export default function SettingsScreen() {
     }
   };
 
+  const loadReminderSettings = async () => {
+    try {
+      const settings = await getReminderSettings();
+      setReminderSettings(settings);
+    } catch (error) {
+      console.error('Failed to load reminder settings:', error);
+    }
+  };
+
   const handleSavePreferences = async () => {
     try {
       await savePreferences({
@@ -48,6 +69,7 @@ export default function SettingsScreen() {
         defaultCurrency,
         darkMode,
       });
+      await saveReminderSettings(reminderSettings);
       Alert.alert('Success', 'Your preferences have been saved.');
     } catch (error) {
       console.error('Failed to save preferences:', error);
@@ -90,6 +112,28 @@ export default function SettingsScreen() {
       console.error('Failed to export history:', error);
       Alert.alert('Error', 'Failed to export calculation history.');
     }
+  };
+
+  const handleNotificationPermissions = async () => {
+    try {
+      const permissions = await requestNotificationPermissions();
+      if (permissions.granted) {
+        setReminderSettings(prev => ({ ...prev, notificationsEnabled: true }));
+        Alert.alert('Success', 'Notification permissions granted!');
+      } else {
+        Alert.alert(
+          'Permissions Required',
+          'Please enable notifications in your device settings to receive GST filing reminders.'
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting permissions:', error);
+      Alert.alert('Error', 'Failed to request permissions.');
+    }
+  };
+
+  const updateReminderSettings = (updates: Partial<ReminderSettings>) => {
+    setReminderSettings(prev => ({ ...prev, ...updates }));
   };
 
   const handleClearHistory = () => {
@@ -199,6 +243,79 @@ export default function SettingsScreen() {
           </View>
           <Text style={styles.settingHint}>
             When enabled, your calculation history will be saved for future reference
+          </Text>
+        </View>
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.section}>
+        <Text style={styles.sectionTitle}>GST Filing Reminders</Text>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Business Type</Text>
+          <View style={styles.businessTypeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                reminderSettings.businessType === 'regular' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateReminderSettings({ businessType: 'regular' })}
+            >
+              <Building size={16} color={reminderSettings.businessType === 'regular' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  reminderSettings.businessType === 'regular' && styles.businessTypeTextSelected,
+                ]}
+              >
+                Regular
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                reminderSettings.businessType === 'composition' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateReminderSettings({ businessType: 'composition' })}
+            >
+              <DollarSign size={16} color={reminderSettings.businessType === 'composition' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  reminderSettings.businessType === 'composition' && styles.businessTypeTextSelected,
+                ]}
+              >
+                Composition
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Enable Notifications</Text>
+            <Switch
+              value={reminderSettings.notificationsEnabled}
+              onValueChange={(value) => {
+                if (value) {
+                  handleNotificationPermissions();
+                } else {
+                  updateReminderSettings({ notificationsEnabled: false });
+                }
+              }}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={reminderSettings.notificationsEnabled ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Receive notifications for upcoming GST filing due dates
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Reminder Days</Text>
+          <Text style={styles.settingHint}>
+            Get notified {reminderSettings.reminderDays.join(', ')} days before due date
           </Text>
         </View>
       </Animated.View>
@@ -377,5 +494,35 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  businessTypeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  businessTypeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F5F7',
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  businessTypeButtonSelected: {
+    backgroundColor: '#1A237E',
+    borderColor: '#1A237E',
+  },
+  businessTypeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1A237E',
+    marginLeft: 6,
+  },
+  businessTypeTextSelected: {
+    color: '#FFFFFF',
   },
 });

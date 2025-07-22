@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Calculator, Clock, Settings, CalculatorIcon, Percent } from 'lucide-react-native';
+import { Calculator, Clock, Settings, CalculatorIcon, Percent, Bell } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -45,6 +45,14 @@ export default function TabLayout() {
           title: 'History',
           tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />,
           headerTitle: 'Calculation History',
+        }}
+      />
+      <Tabs.Screen
+        name="reminders"
+        options={{
+          title: 'Reminders',
+          tabBarIcon: ({ color, size }) => <Bell size={size} color={color} />,
+          headerTitle: 'GST Filing Reminders',
         }}
       />
       <Tabs.Screen
