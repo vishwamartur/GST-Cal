@@ -3,7 +3,7 @@
     "name": "GST Calculator",
     "slug": "gst-calculator",
     "description": "A simple and elegant GST calculator for Indian businesses",
-    "version": "1.1.0",
+    "version": "1.3.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -12,16 +12,20 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.gstcalculator",
-      "buildNumber": "2"
+      "buildNumber": "3"
     },
     "android": {
       "package": "com.yourcompany.gstcalculator",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#1A237E"
       },
-      "permissions": []
+      "permissions": [
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -29,7 +33,14 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#1A237E"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
@@ -41,6 +52,7 @@
       "eas": {
         "projectId": "6811cd39-cf2c-4574-9785-9e27632d598f"
       }
-    }
+    },
+    "owner": "vishwamartur"
   }
 }

@@ -1,0 +1,73 @@
+# GitHub Pages Configuration for GST Calculator Privacy Policy
+
+title: "Privacy Policy - GST Calculator"
+description: "Privacy Policy for GST Calculator - A simple and elegant GST calculator for Indian businesses"
+url: "https://vishwamartur.github.io"
+baseurl: "/GST-Cal"
+
+# Theme
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# SEO
+author: "GST Calculator Team"
+twitter:
+  username: vishwamartur
+  card: summary
+
+# Social
+social:
+  name: "GST Calculator"
+  links:
+    - "https://github.com/vishwamartur/GST-Cal"
+
+# Exclude files from processing
+exclude:
+  - node_modules/
+  - package.json
+  - package-lock.json
+  - .expo/
+  - .expo-shared/
+  - android/
+  - ios/
+  - .github/
+  - "*.log"
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+
+# Include files
+include:
+  - _pages
+  - assets
+
+# Markdown settings
+markdown: kramdown
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+# Collections
+collections:
+  pages:
+    output: true
+    permalink: /:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"

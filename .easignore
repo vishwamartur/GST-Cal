@@ -1,0 +1,63 @@
+# Dependencies
+node_modules/
+
+# Build outputs and cache
+dist/
+web-build/
+build/
+.expo/
+.cache/
+
+# Completely exclude Android directory to avoid tar extraction issues
+# EAS will generate the Android project automatically
+android/
+
+# Development files
+.env*.local
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
+
+# Git
+.git/
+.gitignore
+
+# Documentation and scripts that aren't needed for build
+README.md
+DEPLOYMENT.md
+CLOUD_DEPLOYMENT_GUIDE.md
+QUICK_START_CLOUD_DEPLOYMENT.md
+RELEASE_NOTES.md
+deploy-*.sh
+github-actions-workflow.yml
+create-*.js
+generate-*.js
+
+# Server files (not needed for mobile build)
+server.js
+simple-server.js
+firebase.json
+
+# ESLint config (not needed for build)
+.eslintrc.js
+eslint.config.js

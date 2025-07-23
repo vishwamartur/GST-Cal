@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Switch, Alert, useColorScheme, Share } from 'react-native';
 import { savePreferences, getPreferences, clearHistory, getCalculationHistory } from '@/utils/storage';
+import { getReminderSettings, saveReminderSettings, ReminderSettings } from '@/utils/reminderStorage';
+import { getMarginSettings, saveMarginSettings, ProfitMarginSettings, clearAllMarginData } from '@/utils/profitMarginStorage';
+import { requestNotificationPermissions } from '@/utils/notificationService';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import GSTSelector from '@/components/GSTSelector';
 import CurrencySelector from '@/components/CurrencySelector';
-import { Info, Trash2, Download, Moon } from 'lucide-react-native';
+import { Info, Trash2, Download, Moon, Bell, Building, DollarSign, TrendingUp } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const [defaultGSTRate, setDefaultGSTRate] = useState(18);
@@ -14,8 +17,29 @@ export default function SettingsScreen() {
   const [darkMode, setDarkMode] = useState(false);
   const systemColorScheme = useColorScheme();
 
+  // GST Reminder Settings
+  const [reminderSettings, setReminderSettings] = useState<ReminderSettings>({
+    businessType: 'regular',
+    annualTurnover: 0,
+    reminderDays: [7, 3, 1],
+    notificationsEnabled: true,
+    emailReminders: false,
+  });
+
+  // Profit Margin Settings
+  const [marginSettings, setMarginSettings] = useState<ProfitMarginSettings>({
+    defaultBusinessType: 'B2C',
+    defaultGSTRate: 18,
+    showBreakdownByDefault: true,
+    autoSaveCalculations: true,
+    preferredCurrency: '₹',
+    volumeDiscountEnabled: false,
+  });
+
   useEffect(() => {
     loadPreferences();
+    loadReminderSettings();
+    loadMarginSettings();
   }, []);
 
   const loadPreferences = async () => {
@@ -39,6 +63,24 @@ export default function SettingsScreen() {
     }
   };
 
+  const loadReminderSettings = async () => {
+    try {
+      const settings = await getReminderSettings();
+      setReminderSettings(settings);
+    } catch (error) {
+      console.error('Failed to load reminder settings:', error);
+    }
+  };
+
+  const loadMarginSettings = async () => {
+    try {
+      const settings = await getMarginSettings();
+      setMarginSettings(settings);
+    } catch (error) {
+      console.error('Failed to load margin settings:', error);
+    }
+  };
+
   const handleSavePreferences = async () => {
     try {
       await savePreferences({
@@ -48,6 +90,8 @@ export default function SettingsScreen() {
         defaultCurrency,
         darkMode,
       });
+      await saveReminderSettings(reminderSettings);
+      await saveMarginSettings(marginSettings);
       Alert.alert('Success', 'Your preferences have been saved.');
     } catch (error) {
       console.error('Failed to save preferences:', error);
@@ -90,6 +134,55 @@ export default function SettingsScreen() {
       console.error('Failed to export history:', error);
       Alert.alert('Error', 'Failed to export calculation history.');
     }
+  };
+
+  const handleNotificationPermissions = async () => {
+    try {
+      const permissions = await requestNotificationPermissions();
+      if (permissions.granted) {
+        setReminderSettings(prev => ({ ...prev, notificationsEnabled: true }));
+        Alert.alert('Success', 'Notification permissions granted!');
+      } else {
+        Alert.alert(
+          'Permissions Required',
+          'Please enable notifications in your device settings to receive GST filing reminders.'
+        );
+      }
+    } catch (error) {
+      console.error('Error requesting permissions:', error);
+      Alert.alert('Error', 'Failed to request permissions.');
+    }
+  };
+
+  const updateReminderSettings = (updates: Partial<ReminderSettings>) => {
+    setReminderSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const updateMarginSettings = (updates: Partial<ProfitMarginSettings>) => {
+    setMarginSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleClearMarginData = () => {
+    Alert.alert(
+      'Clear Profit Margin Data',
+      'Are you sure you want to clear all profit margin calculations, presets, and settings?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Clear All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await clearAllMarginData();
+              await loadMarginSettings(); // Reload default settings
+              Alert.alert('Success', 'All profit margin data cleared successfully!');
+            } catch (error) {
+              Alert.alert('Error', 'Failed to clear profit margin data');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleClearHistory = () => {
@@ -203,6 +296,169 @@ export default function SettingsScreen() {
         </View>
       </Animated.View>
 
+      <Animated.View entering={FadeInDown.delay(150).duration(500)} style={styles.section}>
+        <Text style={styles.sectionTitle}>GST Filing Reminders</Text>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Business Type</Text>
+          <View style={styles.businessTypeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                reminderSettings.businessType === 'regular' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateReminderSettings({ businessType: 'regular' })}
+            >
+              <Building size={16} color={reminderSettings.businessType === 'regular' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  reminderSettings.businessType === 'regular' && styles.businessTypeTextSelected,
+                ]}
+              >
+                Regular
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                reminderSettings.businessType === 'composition' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateReminderSettings({ businessType: 'composition' })}
+            >
+              <DollarSign size={16} color={reminderSettings.businessType === 'composition' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  reminderSettings.businessType === 'composition' && styles.businessTypeTextSelected,
+                ]}
+              >
+                Composition
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Enable Notifications</Text>
+            <Switch
+              value={reminderSettings.notificationsEnabled}
+              onValueChange={(value) => {
+                if (value) {
+                  handleNotificationPermissions();
+                } else {
+                  updateReminderSettings({ notificationsEnabled: false });
+                }
+              }}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={reminderSettings.notificationsEnabled ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Receive notifications for upcoming GST filing due dates
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Reminder Days</Text>
+          <Text style={styles.settingHint}>
+            Get notified {reminderSettings.reminderDays.join(', ')} days before due date
+          </Text>
+        </View>
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(175).duration(500)} style={styles.section}>
+        <Text style={styles.sectionTitle}>Profit Margin Calculator</Text>
+
+        <View style={styles.setting}>
+          <Text style={styles.settingLabel}>Default Business Type</Text>
+          <View style={styles.businessTypeSelector}>
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                marginSettings.defaultBusinessType === 'B2B' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateMarginSettings({ defaultBusinessType: 'B2B' })}
+            >
+              <Building size={16} color={marginSettings.defaultBusinessType === 'B2B' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  marginSettings.defaultBusinessType === 'B2B' && styles.businessTypeTextSelected,
+                ]}
+              >
+                B2B
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.businessTypeButton,
+                marginSettings.defaultBusinessType === 'B2C' && styles.businessTypeButtonSelected,
+              ]}
+              onPress={() => updateMarginSettings({ defaultBusinessType: 'B2C' })}
+            >
+              <DollarSign size={16} color={marginSettings.defaultBusinessType === 'B2C' ? '#FFFFFF' : '#1A237E'} />
+              <Text
+                style={[
+                  styles.businessTypeText,
+                  marginSettings.defaultBusinessType === 'B2C' && styles.businessTypeTextSelected,
+                ]}
+              >
+                B2C
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Auto-save Calculations</Text>
+            <Switch
+              value={marginSettings.autoSaveCalculations}
+              onValueChange={(value) => updateMarginSettings({ autoSaveCalculations: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.autoSaveCalculations ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Automatically save profit margin calculations to history
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Show Breakdown by Default</Text>
+            <Switch
+              value={marginSettings.showBreakdownByDefault}
+              onValueChange={(value) => updateMarginSettings({ showBreakdownByDefault: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.showBreakdownByDefault ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Show detailed price breakdown in calculation results
+          </Text>
+        </View>
+
+        <View style={styles.setting}>
+          <View style={styles.settingRow}>
+            <Text style={styles.settingLabel}>Volume Discounts</Text>
+            <Switch
+              value={marginSettings.volumeDiscountEnabled}
+              onValueChange={(value) => updateMarginSettings({ volumeDiscountEnabled: value })}
+              trackColor={{ false: '#E0E0E0', true: '#C5CAE9' }}
+              thumbColor={marginSettings.volumeDiscountEnabled ? '#1A237E' : '#BDBDBD'}
+            />
+          </View>
+          <Text style={styles.settingHint}>
+            Enable volume-based pricing calculations
+          </Text>
+        </View>
+      </Animated.View>
+
       <Animated.View entering={FadeInDown.delay(200).duration(500)} style={styles.section}>
         <Text style={styles.sectionTitle}>Data Management</Text>
 
@@ -214,6 +470,11 @@ export default function SettingsScreen() {
         <TouchableOpacity style={[styles.dataButton, { marginTop: 12 }]} onPress={handleClearHistory}>
           <Trash2 size={20} color="#FF5252" />
           <Text style={styles.dataButtonTextDanger}>Clear Calculation History</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.dataButton, { marginTop: 12 }]} onPress={handleClearMarginData}>
+          <TrendingUp size={20} color="#FF5252" />
+          <Text style={styles.dataButtonTextDanger}>Clear Profit Margin Data</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -377,5 +638,35 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  businessTypeSelector: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+  },
+  businessTypeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F5F5F7',
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  businessTypeButtonSelected: {
+    backgroundColor: '#1A237E',
+    borderColor: '#1A237E',
+  },
+  businessTypeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1A237E',
+    marginLeft: 6,
+  },
+  businessTypeTextSelected: {
+    color: '#FFFFFF',
   },
 });
