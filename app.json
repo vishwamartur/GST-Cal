@@ -17,9 +17,6 @@
     "android": {
       "package": "com.yourcompany.gstcalculator",
       "versionCode": 3,
-      "compileSdkVersion": 35,
-      "targetSdkVersion": 35,
-      "buildToolsVersion": "35.0.0",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#1A237E"
@@ -41,8 +38,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
-          "color": "#1A237E",
-          "sounds": ["./assets/notification.wav"]
+          "color": "#1A237E"
         }
       ]
     ],
