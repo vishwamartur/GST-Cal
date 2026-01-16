@@ -5,22 +5,26 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#1A237E',
-        tabBarInactiveTintColor: '#9E9E9E',
+        tabBarActiveTintColor: '#6366F1',
+        tabBarInactiveTintColor: '#94A3B8',
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 11,
+          fontWeight: '600',
         },
         tabBarStyle: {
-          height: 60,
-          paddingBottom: 8,
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 8,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#F1F5F9',
         },
         headerStyle: {
-          backgroundColor: '#1A237E',
+          backgroundColor: '#6366F1',
         },
         headerTitleStyle: {
           color: '#FFFFFF',
-          fontWeight: '600',
+          fontWeight: '700',
         },
       }}>
       <Tabs.Screen
@@ -28,7 +32,7 @@ export default function TabLayout() {
         options={{
           title: 'GST',
           tabBarIcon: ({ color, size }) => <Percent size={size} color={color} />,
-          headerTitle: 'GST Calculator',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
