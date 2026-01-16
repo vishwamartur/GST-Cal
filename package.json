@@ -39,7 +39,6 @@
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "canvas": "^3.1.0",
-    "eas": "^0.1.0",
     "expo": "~52.0.47",
     "expo-blur": "~14.0.3",
     "expo-calendar": "~14.0.6",
@@ -76,7 +75,6 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~18.3.12",
-    "eas-cli": "^16.9.0",
     "eslint": "^8.57.0",
     "eslint-config-expo": "~8.0.1",
     "typescript": "^5.3.3"
